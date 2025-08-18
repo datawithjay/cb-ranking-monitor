@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.scheduler
+    container_name: coinbase-scheduler
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.local
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - coinbase-network
+
+networks:
+  coinbase-network:
+    driver: bridge

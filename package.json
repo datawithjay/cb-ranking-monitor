@@ -1,0 +1,49 @@
+{
+  "name": "coinbase-ranking-monitor",
+  "version": "1.0.0",
+  "description": "Monitors Coinbase App Store ranking and visualizes data over time",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "scrape": "node scripts/scraper.js",
+    "scheduler": "node scripts/scheduler.js",
+    "test:scraper": "node test/scraper.test.js",
+    "setup": "node scripts/setup.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop coinbase-scheduler",
+    "pm2:logs": "pm2 logs coinbase-scheduler",
+    "pm2:restart": "pm2 restart coinbase-scheduler",
+    "docker:build": "docker build -f Dockerfile.scheduler -t coinbase-scheduler .",
+    "docker:run": "docker-compose up -d scheduler",
+    "docker:stop": "docker-compose down",
+    "docker:logs": "docker-compose logs -f scheduler"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "autoprefixer": "^10.4.16",
+    "axios": "^1.6.0",
+    "chart.js": "^4.4.0",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "cheerio": "^1.0.0-rc.5",
+    "date-fns": "^2.30.0",
+    "next": "^13.5.0",
+    "node-cron": "^3.0.2",
+    "postcss": "^8.4.31",
+    "react": "^18.0.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.0.0",
+    "tailwindcss": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "14.0.0",
+    "typescript": "^5.0.0"
+  }
+}
