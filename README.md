@@ -2,6 +2,8 @@
 
 A web application that monitors Coinbase's ranking in the Apple App Store Finance category every hour and visualizes the data over time using interactive charts.
 
+🌐 **Live Dashboard**: https://cb-ranking-monitor.vercel.app/
+
 ## Features
 
 - **Automated Monitoring**: Scrapes Coinbase's App Store ranking every hour
