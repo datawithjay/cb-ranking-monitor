@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// Load environment variables from .env.local
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+
 // One-time scraper script for manual testing
 import { scrapeAndSave } from '../lib/scraper.js'
 

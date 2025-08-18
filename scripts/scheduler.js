@@ -1,3 +1,7 @@
+// Load environment variables from .env.local
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+
 import cron from 'node-cron'
 import { scrapeAndSave } from '../lib/scraper.js'
 
