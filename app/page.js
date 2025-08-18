@@ -16,46 +16,18 @@ export default function HomePage() {
       setLoading(true)
       setError(null)
       
-      // For now, use mock data to demonstrate the dashboard
-      const mockData = [
-        {
-          id: 1,
-          ranking: 17,
-          rating: 4.7,
-          rating_count: '1.8M Ratings',
-          scraped_at: '2025-08-18T09:00:00Z',
-          created_at: '2025-08-18T09:00:00Z'
-        },
-        {
-          id: 2,
-          ranking: 18,
-          rating: 4.7,
-          rating_count: '1.8M Ratings',
-          scraped_at: '2025-08-18T08:00:00Z',
-          created_at: '2025-08-18T08:00:00Z'
-        },
-        {
-          id: 3,
-          ranking: 19,
-          rating: 4.6,
-          rating_count: '1.8M Ratings',
-          scraped_at: '2025-08-18T07:00:00Z',
-          created_at: '2025-08-18T07:00:00Z'
-        },
-        {
-          id: 4,
-          ranking: 20,
-          rating: 4.6,
-          rating_count: '1.7M Ratings',
-          scraped_at: '2025-08-18T06:00:00Z',
-          created_at: '2025-08-18T06:00:00Z'
-        }
-      ]
+      const response = await fetch('/api/rankings?days=30&limit=200')
+      const result = await response.json()
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch data')
+      }
       
-      setData(mockData)
+      if (result.success) {
+        setData(result.data)
+      } else {
+        throw new Error('Invalid response format')
+      }
     } catch (err) {
       console.error('Error fetching data:', err)
       setError(err.message)
@@ -68,22 +40,28 @@ export default function HomePage() {
     try {
       setScraping(true)
       
-      // Simulate scraping delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      const response = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       
-      // Add a new mock data point
-      const newData = {
-        id: data.length + 1,
-        ranking: 16, // Improved ranking
-        rating: 4.7,
-        rating_count: '1.8M Ratings',
-        scraped_at: new Date().toISOString(),
-        created_at: new Date().toISOString()
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.details || result.error || 'Failed to scrape')
       }
       
-      setData(prevData => [...prevData, newData])
-      alert(`Successfully scraped! New ranking: #${newData.ranking}`)
-      
+      if (result.success) {
+        // Refresh the data after successful scrape
+        await fetchData()
+        
+        // Show success message (you could use a toast library here)
+        alert(`Successfully scraped! New ranking: #${result.data.ranking}`)
+      } else {
+        throw new Error('Scraping failed')
+      }
     } catch (err) {
       console.error('Error during manual scrape:', err)
       alert(`Scraping failed: ${err.message}`)
