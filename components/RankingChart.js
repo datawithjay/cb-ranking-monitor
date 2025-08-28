@@ -75,14 +75,16 @@ export default function RankingChart({ data, loading, error }) {
   const filteredData = filterDataByTimeRange(data, timeRange)
 
   const chartData = {
-    labels: filteredData.map(item => {
-      const date = new Date(item.scraped_at)
-      return isNaN(date.getTime()) ? new Date() : date
-    }),
     datasets: [
       {
         label: 'App Store Ranking',
-        data: filteredData.map(item => item.ranking),
+        data: filteredData.map(item => ({
+          x: new Date(item.scraped_at),
+          y: item.ranking,
+          scraped_at: item.scraped_at,
+          rating: item.rating,
+          rating_count: item.rating_count
+        })),
         borderColor: '#0052FF',
         backgroundColor: 'rgba(0, 82, 255, 0.1)',
         borderWidth: 2,
@@ -130,17 +132,47 @@ export default function RankingChart({ data, loading, error }) {
         callbacks: {
           title: function(context) {
             try {
-              const date = new Date(context[0].label)
-              if (isNaN(date.getTime())) {
-                return 'Invalid Date'
+              // Access the raw data point which contains our custom data
+              const dataPoint = context[0].raw
+              
+              if (dataPoint && dataPoint.scraped_at) {
+                const date = new Date(dataPoint.scraped_at)
+                if (!isNaN(date.getTime())) {
+                  return format(date, 'MMM dd, yyyy HH:mm')
+                }
               }
-              return format(date, 'MMM dd, yyyy HH:mm')
+              
+              // Fallback: try to parse from the chart's x value
+              const xValue = context[0].parsed.x
+              if (xValue) {
+                const date = new Date(xValue)
+                if (!isNaN(date.getTime())) {
+                  return format(date, 'MMM dd, yyyy HH:mm')
+                }
+              }
+              
+              return 'Date unavailable'
             } catch (error) {
-              return 'Invalid Date'
+              console.error('Tooltip date error:', error)
+              return 'Date unavailable'
             }
           },
           label: function(context) {
-            return `Ranking: #${context.parsed.y}`
+            const dataPoint = context.raw
+            const ranking = context.parsed.y
+            
+            let label = `Ranking: #${ranking}`
+            
+            // Add rating information if available
+            if (dataPoint && dataPoint.rating) {
+              label += `\nRating: ${dataPoint.rating}/5.0`
+            }
+            
+            if (dataPoint && dataPoint.rating_count) {
+              label += ` (${dataPoint.rating_count})`
+            }
+            
+            return label
           }
         }
       }
