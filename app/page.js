@@ -16,7 +16,7 @@ export default function HomePage() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/rankings?days=30&limit=1000')
+      const response = await fetch('/api/rankings?days=31&limit=1000')
       const result = await response.json()
       
       if (!response.ok) {
