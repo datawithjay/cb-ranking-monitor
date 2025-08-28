@@ -38,25 +38,38 @@ export default function RankingChart({ data, loading, error }) {
     
     const now = new Date()
     let cutoffTime
+    let maxPoints = 1000 // Default max points
     
     switch (range) {
       case '6h':
         cutoffTime = new Date(now.getTime() - 6 * 60 * 60 * 1000)
+        maxPoints = 72 // 6 hours * 12 points per hour (every 5 min worth)
         break
       case '24h':
         cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        maxPoints = 144 // 24 hours * 6 points per hour (every 10 min worth)
         break
       case '7d':
         cutoffTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        maxPoints = 336 // 7 days * 2 points per hour (every 30 min worth)
         break
       case '30d':
         cutoffTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        maxPoints = 720 // 30 days * 1 point per hour
         break
       default:
         return data
     }
     
-    return data.filter(item => new Date(item.scraped_at) >= cutoffTime)
+    let filtered = data.filter(item => new Date(item.scraped_at) >= cutoffTime)
+    
+    // If we have too many points, thin them out by taking every nth point
+    if (filtered.length > maxPoints) {
+      const step = Math.ceil(filtered.length / maxPoints)
+      filtered = filtered.filter((_, index) => index % step === 0)
+    }
+    
+    return filtered
   }
 
   const filteredData = filterDataByTimeRange(data, timeRange)

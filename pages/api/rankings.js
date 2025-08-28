@@ -23,18 +23,22 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
     
-    const { limit = '100', days = '30' } = req.query
+    const { limit = '1000', days = '30' } = req.query
     
     // Calculate the date filter
     const daysAgo = new Date()
     daysAgo.setDate(daysAgo.getDate() - parseInt(days))
     
-    const { data, error } = await supabase
+    // Get data in descending order first (newest first), then reverse
+    const { data: rawData, error } = await supabase
       .from('coinbase_rankings')
       .select('*')
       .gte('scraped_at', daysAgo.toISOString())
-      .order('scraped_at', { ascending: true })
+      .order('scraped_at', { ascending: false })
       .limit(parseInt(limit))
+    
+    // Reverse to get chronological order (oldest first) for the chart
+    const data = rawData ? rawData.reverse() : []
     
     if (error) {
       console.error('Supabase error:', error)
