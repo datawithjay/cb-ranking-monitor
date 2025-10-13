@@ -57,6 +57,18 @@ export default function RankingChart({ data, loading, error }) {
         cutoffTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
         maxPoints = 720 // 30 days * 1 point per hour
         break
+      case 'all':
+        // Return all data with smart thinning for performance
+        maxPoints = 1000 // Reasonable limit for all-time view
+        let allData = [...data]
+        
+        // If we have too many points, thin them out by taking every nth point
+        if (allData.length > maxPoints) {
+          const step = Math.ceil(allData.length / maxPoints)
+          allData = allData.filter((_, index) => index % step === 0)
+        }
+        
+        return allData
       default:
         return data
     }
@@ -255,7 +267,7 @@ export default function RankingChart({ data, loading, error }) {
           Ranking Timeline
         </h2>
         <div className="flex space-x-2">
-          {['6h', '24h', '7d', '30d'].map((range) => (
+          {['6h', '24h', '7d', '30d', 'all'].map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
@@ -265,7 +277,7 @@ export default function RankingChart({ data, loading, error }) {
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
-              {range}
+              {range === 'all' ? 'All Time' : range}
             </button>
           ))}
         </div>
@@ -276,7 +288,7 @@ export default function RankingChart({ data, loading, error }) {
       </div>
       
       <div className="mt-4 text-sm text-gray-600">
-        <p>Showing {filteredData.length} data points from the last {timeRange}</p>
+        <p>Showing {filteredData.length} data points {timeRange === 'all' ? 'from all time' : `from the last ${timeRange}`}</p>
         {filteredData.length > 0 && (
           <p>
             Latest ranking: #{filteredData[filteredData.length - 1]?.ranking} 
