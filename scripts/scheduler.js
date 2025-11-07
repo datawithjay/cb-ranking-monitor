@@ -1,3 +1,11 @@
+// DEPRECATED: This scheduler is no longer used
+// Apple has restricted desktop access to App Store rankings
+// Manual entry is now used instead via the web UI
+//
+// See: Manual entry form at /components/ManualEntryForm.js
+// Last updated: 2025-11-07
+
+/*
 // Load environment variables from .env.local
 import dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
@@ -7,7 +15,14 @@ import { scrapeAndSave } from '../lib/scraper.js'
 
 console.log('🚀 Coinbase Ranking Scheduler Started')
 console.log('📅 Scheduled to run every hour at minute 0')
+*/
 
+console.log('⚠️  This scheduler has been deprecated.')
+console.log('📱 Please use the manual entry form in the web UI to add rankings.')
+console.log('   Rankings can only be viewed on iOS/iPadOS App Store app.')
+process.exit(0)
+
+/*
 // Schedule the task to run every hour at minute 0
 // Cron format: minute(0-59) hour(0-23) day(1-31) month(1-12) weekday(0-7)
 cron.schedule('0 * * * *', async () => {
@@ -55,3 +70,4 @@ process.on('SIGTERM', () => {
 })
 
 console.log('⚡ Scheduler is running. Press Ctrl+C to stop.')
+*/'

@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import StatsCards from '../components/StatsCards'
 import RankingChart from '../components/RankingChart'
+import ManualEntryForm from '../components/ManualEntryForm'
 
 export default function HomePage() {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [scraping, setScraping] = useState(false)
 
   const fetchData = async () => {
     try {
@@ -36,38 +36,12 @@ export default function HomePage() {
     }
   }
 
-  const triggerManualScrape = async () => {
-    try {
-      setScraping(true)
-      
-      const response = await fetch('/api/scrape', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.details || result.error || 'Failed to scrape')
-      }
-      
-      if (result.success) {
-        // Refresh the data after successful scrape
-        await fetchData()
-        
-        // Show success message (you could use a toast library here)
-        alert(`Successfully scraped! New ranking: #${result.data.ranking}`)
-      } else {
-        throw new Error('Scraping failed')
-      }
-    } catch (err) {
-      console.error('Error during manual scrape:', err)
-      alert(`Scraping failed: ${err.message}`)
-    } finally {
-      setScraping(false)
-    }
+  const handleManualEntrySuccess = async (newEntry) => {
+    // Refresh the data after successful manual entry
+    await fetchData()
+    
+    // Show success message
+    alert(`✅ Entry saved successfully! Ranking: #${newEntry.ranking}`)
   }
 
   useEffect(() => {
@@ -103,14 +77,6 @@ export default function HomePage() {
             >
               {loading ? '🔄 Loading...' : '🔄 Refresh'}
             </button>
-            
-            <button
-              onClick={triggerManualScrape}
-              disabled={scraping || loading}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {scraping ? '⏳ Scraping...' : '🔍 Manual Scrape'}
-            </button>
           </div>
         </div>
 
@@ -133,11 +99,18 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* Manual Entry Form */}
+        <ManualEntryForm onSuccess={handleManualEntrySuccess} />
+
         {/* Stats Cards */}
-        <StatsCards data={data} loading={loading} />
+        <div className="mt-8">
+          <StatsCards data={data} loading={loading} />
+        </div>
 
         {/* Chart */}
-        <RankingChart data={data} loading={loading} error={error} />
+        <div className="mt-8">
+          <RankingChart data={data} loading={loading} error={error} />
+        </div>
 
         {/* Footer Info */}
         <div className="mt-12 card p-6">
@@ -148,10 +121,10 @@ export default function HomePage() {
             <div>
               <h4 className="font-medium text-gray-900 mb-2">How it works</h4>
               <ul className="space-y-1">
-                <li>• Scrapes Coinbase's App Store page every hour</li>
-                <li>• Extracts ranking from the Finance category</li>
-                <li>• Stores historical data in Supabase</li>
-                <li>• Displays trends with interactive charts</li>
+                <li>• Manual entry of App Store rankings (via iPhone/iPad)</li>
+                <li>• Track ranking changes in the Finance category</li>
+                <li>• Historical data stored in Supabase</li>
+                <li>• Interactive charts show trends over time</li>
               </ul>
             </div>
             <div>
